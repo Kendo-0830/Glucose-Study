@@ -727,17 +727,31 @@
       }
     }
         
-        function selectGroup(group) {
+        async function selectGroup(group) {
             groupAssignment = group;
             localStorage.setItem('groupAssignment', group);
             console.log('Group selected:', group);
-            console.log('Attempting to show demographics-section');
             
-            // Make sure section exists
-            const demoSection = document.getElementById('demographics-section');
-            if (!demoSection) {
-                console.error('ERROR: demographics-section not found!');
-                return;
+            // Create participant ID immediately
+            participantId = 'P' + Date.now();
+            localStorage.setItem('participantId', participantId);
+            
+            // POST to Google Sheets immediately with just group assignment
+            try {
+                console.log('Creating initial entry with group:', group);
+                await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        participantId: participantId,
+                        groupAssignment: group,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+                console.log('Initial entry created');
+            } catch (error) {
+                console.error('Error creating entry:', error);
             }
             
             showSection('demographics-section');
