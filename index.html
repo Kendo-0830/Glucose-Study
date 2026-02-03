@@ -790,8 +790,7 @@
         
         localStorage.setItem('participantId', participantId);
         localStorage.setItem('demographics', JSON.stringify(demographics));
-        showSection('waiting-section');
-        startPolling();
+        // Already have a better handler above - this is removed
       } catch (error) {
         console.error('Error:', error);
         alert('Error: ' + error.message);
