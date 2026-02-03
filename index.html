@@ -529,7 +529,7 @@
         <h1> Glucose Group</h1>
         <p style="font-size: 1.3rem; margin: 2rem 0; color: #333;">Please wait for the administrator to give you the glucose tablet.</p>
         <p style="color: #666; margin-bottom: 3rem;">Once you have received the tablet, click the button below.</p>
-        <button class="btn" onclick="showSection('glucose-bg1-section')">I Have Received the Tablet</button>
+        <button class="btn" onclick="this.disabled=true; this.textContent='Loading...'; showSection('glucose-bg1-section')">I Have Received the Tablet</button>
       </div>
     </div>
     
@@ -560,7 +560,7 @@
         <h1> 15-Minute Wait</h1>
         <p style="font-size: 1.3rem; margin: 2rem 0; color: #333;">You will now wait 15 minutes.</p>
         <p style="color: #666; margin-bottom: 3rem;">Click the button below to start the timer.</p>
-        <button class="btn" onclick="startTimer()">Start 15-Minute Timer</button>
+        <button class="btn" onclick="this.disabled=true; this.textContent='Starting...'; startTimer()">Start 15-Minute Timer</button>
       </div>
     </div>
     
@@ -590,7 +590,7 @@
         <h1> Ready for Post-Test</h1>
         <p style="font-size: 1.3rem; margin: 2rem 0; color: #333;">You will now take the test again.</p>
         <p style="color: #666; margin-bottom: 3rem;">Same task: Match the POSITION and LETTER from 2 steps ago</p>
-        <button class="btn" onclick="showSection('posttest-section'); startPostTest()">Start Post-Test</button>
+        <button class="btn" onclick="this.disabled=true; this.textContent='Loading...'; showSection('posttest-section'); startPostTest()">Start Post-Test</button>
       </div>
     </div>
     
@@ -698,14 +698,30 @@
     const POLL_TIMEOUT = 300000;
     
     function showSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      if (!section) {
+        console.error('Section not found:', sectionId);
+        console.error('Available sections:', Array.from(document.querySelectorAll('.section')).map(s => s.id));
+        return;
+      }
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-      document.getElementById(sectionId).classList.add('active');
+      section.classList.add('active');
+      console.log('Showing section:', sectionId);
     }
         
         function selectGroup(group) {
             groupAssignment = group;
             localStorage.setItem('groupAssignment', group);
             console.log('Group selected:', group);
+            console.log('Attempting to show demographics-section');
+            
+            // Make sure section exists
+            const demoSection = document.getElementById('demographics-section');
+            if (!demoSection) {
+                console.error('ERROR: demographics-section not found!');
+                return;
+            }
+            
             showSection('demographics-section');
         }
         
@@ -722,6 +738,13 @@
         return;
       }
       isSubmitting = true;
+      
+      // Disable submit button IMMEDIATELY
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Loading...';
+      }
       
       const demographics = {
         firstName: document.getElementById('firstName').value.trim(),
