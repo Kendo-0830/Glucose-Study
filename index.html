@@ -711,8 +711,17 @@
         
     
     // PHASE 1: Submit demographics
+    let isSubmitting = false;
+    
     document.getElementById('demographics-form').addEventListener('submit', async (e) => {
       e.preventDefault();
+      
+      // Prevent double submission
+      if (isSubmitting) {
+        console.log('Already submitting, ignoring...');
+        return;
+      }
+      isSubmitting = true;
       
       const demographics = {
         firstName: document.getElementById('firstName').value.trim(),
@@ -915,6 +924,16 @@
       } else {
         postDifficultyRating = rating;
         document.getElementById('submit-post-rating').disabled = false;
+      
+      // Disable button after first click
+      document.getElementById('submit-post-rating').onclick = function() {
+        console.log('Button clicked');
+        if (postDifficultyRating > 0) {
+          this.disabled = true;
+          this.textContent = 'Submitting...';
+          submitPostDifficulty();
+        }
+      };
       }
     }
     
@@ -997,19 +1016,30 @@
       showSection('posttest-instructions-section');
     }
     
+    let isFinalSubmitting = false;
+    
     async function submitPostDifficulty() {
+      if (isFinalSubmitting) {
+        console.log('Already submitting final data...');
+        return;
+      }
+      isFinalSubmitting = true;
+      
       studyData.postTest.difficultyRating = postDifficultyRating;
       
       // Calculate change
       const scoreChange = studyData.postTest.score - studyData.preTest.score;
       const rtChange = studyData.postTest.avgReactionTime - studyData.preTest.avgReactionTime;
       
-      try {
-        await fetch(APPS_SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+      console.log('========================');
+        console.log('POSTING TO GOOGLE SHEETS');
+        console.log('========================');
+        console.log('Participant ID:', participantId);
+        console.log('Group:', groupAssignment);
+        console.log('This should only happen ONCE!');
+        
+        try {
+        const postData = {
             participantId: participantId,
             groupAssignment: groupAssignment,
             demographics: studyData.demographics,
@@ -1018,8 +1048,18 @@
             preTest: studyData.preTest,
             postTest: studyData.postTest,
             timestamp: new Date().toISOString()
-          })
+          };
+          
+        console.log('Data being sent:', postData);
+        
+        await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(postData)
         });
+        
+        console.log('POST complete!');
         
         // Show results
         document.getElementById('final-pre-score').textContent = studyData.preTest.score + '%';
