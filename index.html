@@ -698,15 +698,33 @@
     const POLL_TIMEOUT = 300000;
     
     function showSection(sectionId) {
-      const section = document.getElementById(sectionId);
-      if (!section) {
-        console.error('Section not found:', sectionId);
-        console.error('Available sections:', Array.from(document.querySelectorAll('.section')).map(s => s.id));
-        return;
+      console.log('showSection called with:', sectionId);
+      
+      try {
+        const section = document.getElementById(sectionId);
+        if (!section) {
+          console.error('Section not found:', sectionId);
+          const allSections = document.querySelectorAll('.section');
+          console.error('Available sections:', Array.from(allSections).map(s => s.id).filter(id => id));
+          return;
+        }
+        
+        // Remove active from all sections
+        const allSections = document.querySelectorAll('.section');
+        allSections.forEach(s => {
+          if (s && s.classList) {
+            s.classList.remove('active');
+          }
+        });
+        
+        // Add active to target section
+        section.classList.add('active');
+        console.log('Successfully showing section:', sectionId);
+        
+      } catch (error) {
+        console.error('Error in showSection:', error);
+        console.error('Section ID:', sectionId);
       }
-      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-      section.classList.add('active');
-      console.log('Showing section:', sectionId);
     }
         
         function selectGroup(group) {
