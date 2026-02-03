@@ -121,6 +121,40 @@
             background: #7f8c8d;
         }
         
+        /* Group selection buttons */
+        .group-btn {
+            padding: 3rem 2rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        
+        .group-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+        
+        .glucose-btn {
+            background: #ffb3d9;
+        }
+        
+        .glucose-btn:hover {
+            background: #ff99cc;
+        }
+        
+        .control-btn {
+            background: #87ceeb;
+        }
+        
+        .control-btn:hover {
+            background: #6fb9e0;
+        }
+        
         .text-center {
             text-align: center;
         }
@@ -315,8 +349,23 @@
 </head>
 <body>
   <div class="container">
-    <!-- PHASE 1: DEMOGRAPHICS -->
-    <div id="demographics-section" class="section active">
+            <!-- SCREEN 1: GROUP SELECTION -->
+        <div id="group-selection-section" class="section active">
+            <h1>Group Assignment</h1>
+            <p class="text-center" style="font-size: 1.2rem; margin: 2rem 0; color: #333;">Please select your assigned group:</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem;">
+                <button class="group-btn glucose-btn" onclick="selectGroup('glucose')">
+                    Glucose Group
+                </button>
+                <button class="group-btn control-btn" onclick="selectGroup('control')">
+                    Control Group
+                </button>
+            </div>
+        </div>
+        
+        <!-- PHASE 1: DEMOGRAPHICS -->
+    <div id="demographics-section" class="section">
       <h1> Participant Information</h1>
       <form id="demographics-form">
         <div class="form-group">
@@ -358,27 +407,6 @@
         </div>
         <button type="submit" class="btn">Submit & Continue</button>
       </form>
-    </div>
-    
-    <!-- WAITING FOR ASSIGNMENT -->
-    <div id="waiting-section" class="section">
-      <div class="text-center">
-        <h1> Please Wait</h1>
-        <div class="spinner"></div>
-        <p style="color: #666; font-size: 1.1rem; margin-top: 1rem;">Waiting for administrator to assign you to a group...</p>
-        <p style="color: #999; margin-top: 1rem; font-size: 0.9rem;">This usually takes 1-2 minutes</p>
-        <div id="waiting-error"></div>
-      </div>
-    </div>
-    
-    <!-- ASSIGNMENT RECEIVED -->
-    <div id="assigned-section" class="section">
-      <div class="text-center">
-        <h1> Assignment Received!</h1>
-        <p style="font-size: 1.2rem; margin: 2rem 0; color: #333;">You have been assigned to a group.</p>
-        <p style="font-size: 1rem; color: #666; margin-bottom: 2rem;">Click continue to proceed to the test instructions.</p>
-        <button class="btn" onclick="continueToInstructions()">Continue to Instructions</button>
-      </div>
     </div>
     
     <!-- PHASE 2: INSTRUCTIONS -->
@@ -516,7 +544,17 @@
       <button class="btn" onclick="submitBG1()">Continue</button>
     </div>
     
-    <!-- START TIMER SCREEN (BOTH GROUPS) -->
+    
+        <!-- GLUCOSE - READY TO START TIMER -->
+        <div id="glucose-ready-timer-section" class="section">
+            <div class="text-center">
+                <h1>Ready to Begin Wait Period</h1>
+                <p style="font-size: 1.2rem; margin: 2rem 0; color: #333;">The 15-minute timer is about to start.</p>
+                <p style="color: #666; margin-bottom: 3rem;">Click the button below when you're ready to begin the wait period.</p>
+                <button class="btn" onclick="startTimerFromReady()">Start Timer</button>
+            </div>
+        </div>
+        <!-- START TIMER SCREEN (BOTH GROUPS) -->
     <div id="start-timer-section" class="section">
       <div class="text-center">
         <h1> 15-Minute Wait</h1>
@@ -663,6 +701,14 @@
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
       document.getElementById(sectionId).classList.add('active');
     }
+        
+        function selectGroup(group) {
+            groupAssignment = group;
+            localStorage.setItem('groupAssignment', group);
+            console.log('Group selected:', group);
+            showSection('demographics-section');
+        }
+        
     
     // PHASE 1: Submit demographics
     document.getElementById('demographics-form').addEventListener('submit', async (e) => {
@@ -701,66 +747,6 @@
         alert('Error: ' + error.message);
       }
     });
-    
-    function startPolling() {
-      let pollCount = 0;
-      const maxPolls = POLL_TIMEOUT / POLL_INTERVAL;
-      
-      pollInterval = setInterval(async () => {
-        pollCount++;
-        try {
-          const response = await fetch(APPS_SCRIPT_URL + '?participantId=' + participantId);
-          const result = await response.json();
-          
-          if (result.status === 'success' && result.data && result.data.length > 0) {
-            const participant = result.data[0];
-            const assignment = participant['Assignment'] || participant['Group Assignment'] || participant['Group'];
-            
-            // STRICT: Only accept exact "glucose" or "control"
-            if (assignment) {
-              const assignmentLower = assignment.toString().toLowerCase().trim();
-              console.log('[POLL] Raw assignment value:', assignment);
-              console.log('[POLL] Cleaned:', assignmentLower);
-              
-              // Must be EXACTLY "glucose" or "control" (or contain these words)
-              let validGroup = null;
-              if (assignmentLower === 'glucose' || assignmentLower.includes('glucose')) {
-                validGroup = 'glucose';
-              } else if (assignmentLower === 'control' || assignmentLower.includes('control')) {
-                validGroup = 'control';
-              }
-              
-              if (validGroup) {
-                console.log('[POLL] Valid assignment detected:', validGroup);
-                stopPolling();
-                groupAssignment = validGroup;
-                localStorage.setItem('groupAssignment', groupAssignment);
-                showSection('assigned-section');
-              } else {
-                console.log('[POLL] ❌ Invalid/empty assignment, continuing to poll...');
-              }
-            } else {
-              console.log('[POLL] No assignment value yet');
-            }
-          }
-          
-          if (pollCount >= maxPolls) {
-            stopPolling();
-            document.getElementById('waiting-error').innerHTML = 
-              '<div style="color: red; margin-top: 1rem;">Timeout: Administrator has not assigned you yet.</div>';
-          }
-        } catch (error) {
-          console.error('Polling error:', error);
-        }
-      }, POLL_INTERVAL);
-    }
-    
-    function stopPolling() {
-      if (pollInterval) {
-        clearInterval(pollInterval);
-        pollInterval = null;
-      }
-    }
     
     function generateSequence(numTrials) {
       const sequence = [];
@@ -960,7 +946,12 @@
         return;
       }
       studyData.bloodGlucose.before = parseInt(bg1);
-      showSection('start-timer-section');
+      showSection('glucose-ready-timer-section');
+    }
+    
+    function startTimerFromReady() {
+      showSection('timer-section');
+      startTimer();
     }
     
     function startTimer() {
@@ -1046,31 +1037,17 @@
     }
     
     window.addEventListener('load', () => {
-      // For fresh participants, always start at demographics
-      // localStorage is only used for recovery if page is accidentally closed
-      // during an active session, not for returning later
-      
-      // Clear any old localStorage data from previous completed studies
-      const savedParticipantId = localStorage.getItem('participantId');
-      
-      // Don't auto-resume - this prevents the "stuck" issue
-      // Each new device/browser session starts fresh at demographics
-      if (!savedParticipantId) {
-        // Completely fresh - stay on demographics form (default)
-        return;
-      }
-      
-      // If there IS saved data, it's from this session being interrupted
-      // Only resume if we were actively waiting for assignment
-      const savedAssignment = localStorage.getItem('groupAssignment');
-      if (savedParticipantId && !savedAssignment) {
-        // Was waiting for assignment when page closed - resume polling
-        participantId = savedParticipantId;
-        showSection('waiting-section');
-        startPolling();
-      }
-      // Otherwise, start fresh (demographics form is already showing)
-    });
+            // Check if returning to study
+            const savedParticipantId = localStorage.getItem('participantId');
+            const savedAssignment = localStorage.getItem('groupAssignment');
+            
+            if (savedParticipantId) {
+                participantId = savedParticipantId;
+            }
+            if (savedAssignment) {
+                groupAssignment = savedAssignment;
+            }
+        });
   </script>
 </body>
 </html>
