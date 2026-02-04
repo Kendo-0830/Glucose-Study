@@ -895,13 +895,16 @@
             const current = tutorialSequence[tutorialTrial];
             displayStimulus('tutorial-grid', current.position, current.letter);
             
+            // Use fixed timing intervals
             tutorialTimeout = setTimeout(() => {
                 displayStimulus('tutorial-grid', null, null);
-                setTimeout(() => {
-                    tutorialTrial++;
-                    showTutorialTrial();
-                }, 2500);
             }, 500);
+            
+            // Schedule next trial at exact 3000ms
+            setTimeout(() => {
+                tutorialTrial++;
+                showTutorialTrial();
+            }, 3000);
         }
         
         function handleTutorialResponse(type) {
@@ -955,16 +958,18 @@
             preTestStartTime = Date.now();
             displayStimulus('pretest-grid', current.position, current.letter);
             
+            // Use fixed timing intervals
             preTestTimeout = setTimeout(() => {
                 // No response - record 0ms
                 preTestReactionTimes.push(0);
                 displayStimulus('pretest-grid', null, null);
-                
-                setTimeout(() => {
-                    preTestTrial++;
-                    showPreTestTrial();
-                }, 2500);
             }, 500);
+            
+            // Schedule next trial at exact 3000ms from start
+            setTimeout(() => {
+                preTestTrial++;
+                showPreTestTrial();
+            }, 3000);
         }
         
         function handlePreTestResponse(type) {
@@ -1117,16 +1122,18 @@
             postTestStartTime = Date.now();
             displayStimulus('posttest-grid', current.position, current.letter);
             
+            // Use fixed timing intervals
             postTestTimeout = setTimeout(() => {
                 // No response - record 0ms
                 postTestReactionTimes.push(0);
                 displayStimulus('posttest-grid', null, null);
-                
-                setTimeout(() => {
-                    postTestTrial++;
-                    showPostTestTrial();
-                }, 2500);
             }, 500);
+            
+            // Schedule next trial at exact 3000ms from start
+            setTimeout(() => {
+                postTestTrial++;
+                showPostTestTrial();
+            }, 3000);
         }
         
         function handlePostTestResponse(type) {
