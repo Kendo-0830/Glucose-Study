@@ -671,6 +671,11 @@
     </div>
 
     <script>
+        // Request notification permission when page loads
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+        
         // Configuration
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBrM9JGR3r6sRPQCfYYvFnk-rY6vCffM3nx4O4MViPbIBK65cmu5vlvu-cbhDNO3X1/exec';
         const TIMER_DURATION = 900; // 15 minutes in seconds
@@ -699,6 +704,9 @@
         // Timer variables
         let timeRemaining = TIMER_DURATION;
         let timerInterval = null;
+        let timerStartTime = null;
+        let oneMinuteWarningShown = false;
+        let originalTitle = document.title;
         
         // Difficulty ratings
         let preDifficultyRating = 0;
@@ -1046,14 +1054,28 @@
             }
         }
         
-        // TIMER
+        // TIMER (uses timestamps for accuracy)
+        let timerStartTime = null;
+        let oneMinuteWarningShown = false;
+        
         function startTimer() {
+            timerStartTime = Date.now();
             timeRemaining = TIMER_DURATION;
+            oneMinuteWarningShown = false;
             showSection('timer-section');
             updateTimerDisplay();
             
             timerInterval = setInterval(() => {
-                timeRemaining--;
+                // Calculate time remaining based on actual elapsed time
+                const elapsed = Math.floor((Date.now() - timerStartTime) / 1000);
+                timeRemaining = TIMER_DURATION - elapsed;
+                
+                // Show warning at 1 minute
+                if (timeRemaining <= 60 && timeRemaining > 59 && !oneMinuteWarningShown) {
+                    oneMinuteWarningShown = true;
+                    showTimerWarning();
+                }
+                
                 updateTimerDisplay();
                 
                 if (timeRemaining <= 0) {
@@ -1076,6 +1098,38 @@
             const seconds = timeRemaining % 60;
             document.getElementById('timer-display').textContent = 
                 `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        function showTimerWarning() {
+            const timerDisplay = document.getElementById('timer-display');
+            const originalColor = timerDisplay.style.color;
+            
+            // Flash the timer and show message
+            timerDisplay.style.color = '#e74c3c';
+            
+            // Create warning message
+            const warning = document.createElement('p');
+            warning.textContent = 'One minute remaining';
+            warning.style.cssText = 'text-align: center; color: #e74c3c; font-size: 1.5rem; font-weight: 600; margin-top: 2rem; animation: fadeIn 0.5s;';
+            warning.id = 'timer-warning';
+            
+            const timerSection = document.getElementById('timer-section');
+            const existingWarning = document.getElementById('timer-warning');
+            if (existingWarning) {
+                existingWarning.remove();
+            }
+            timerSection.appendChild(warning);
+            
+            // Flash effect
+            setTimeout(() => {
+                timerDisplay.style.color = originalColor;
+            }, 500);
+            setTimeout(() => {
+                timerDisplay.style.color = '#e74c3c';
+            }, 1000);
+            setTimeout(() => {
+                timerDisplay.style.color = originalColor;
+            }, 1500);
         }
         
         // BG #2 ENTRY (Glucose only)
@@ -1302,6 +1356,16 @@
             }
             if (savedAssignment) {
                 groupAssignment = savedAssignment;
+            }
+        });
+        
+        // Handle tab visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && timeRemaining <= 0 && timerStartTime !== null) {
+                // They returned after timer finished
+                if (!document.getElementById('timer-complete-modal')) {
+                    showTimerCompleteModal();
+                }
             }
         });
     </script>
