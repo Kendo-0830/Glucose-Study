@@ -465,7 +465,7 @@ async function loadData() {
                         return id && id.toString().trim() !== '' && id.toString().startsWith('P');
                     });
                     console.log('Filtered data:', allData);
-                    console.log('Using column:', Object.keys(json.data[0])[0], 'as Participant ID');
+                    if (json.data.length > 0 && json.data[0]) console.log('Using column:', Object.keys(json.data[0])[0], 'as Participant ID');
                     displayData(allData);
                     updateAnalytics(allData);
                     document.getElementById('total-count').textContent = allData.length;
@@ -521,7 +521,13 @@ async function loadData() {
             html += '</tbody></table>';
             document.getElementById('data-container').innerHTML = html;
         }
-
+            } catch (error) {
+                console.error('Error displaying data:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').textContent = 'Error loading data. Please refresh the page.';
+                document.getElementById('error').style.display = 'block';
+            }
+        
         async function deleteParticipant(participantId, firstName) {
             if (!participantId) {
                 alert('Cannot delete: No participant ID');
