@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glucose & Cognitive Performance Study</title>
+    
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #e6f2ff;
+            min-height: 100vh;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+        
+        h1 {
+            color: #5a9fd4;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+        
+        h2 {
+            color: #5a9fd4;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        h3 {
+            color: #5a9fd4;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 1rem 0 0.5rem 0;
+        }
+        
+        p {
+            color: #555;
+            margin-bottom: 1rem;
+        }
+        
+        .section { 
+            display: none; 
+        }
+        
+        .section.active { 
+            display: block; 
+        }
+        
+        .form-group { 
+            margin-bottom: 1.5rem; 
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #9b87f5;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 0.9rem;
+            background: #9b87f5;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #8b77e5;
+        }
+        
+        .btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        /* Group selection buttons */
+        .group-btn {
+            padding: 3rem 2rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        
+        .group-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+        
+        .glucose-btn {
+            background: #ffb3d9;
+        }
+        
+        .glucose-btn:hover {
+            background: #ff99cc;
+        }
+        
+        .control-btn {
+            background: #87ceeb;
+        }
+        
+        .control-btn:hover {
+            background: #6fb9e0;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        /* Test grid */
+        .grid-3x3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            max-width: 350px;
+            margin: 2rem auto;
+        }
+        
+        .grid-cell {
+            aspect-ratio: 1;
+            border: 2px solid #9b87f5;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #9b87f5;
+            background: white;
+        }
+        
+        .grid-cell.active {
+            background: #9b87f5;
+            color: white;
+        }
+        
+        /* Test buttons */
+        .button-row {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem auto;
+            max-width: 550px;
+        }
+        
+        .test-button {
+            flex: 1;
+            padding: 1.2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: 2px solid #9b87f5;
+            background: white;
+            color: #9b87f5;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            background: #9b87f5;
+            color: white;
+        }
+        
+        .test-button.pulse {
+            animation: buttonPulse 0.2s;
+        }
+        
+        @keyframes buttonPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(0.95); }
+        }
+        
+        /* Instructions box */
+        .instructions {
+            background: #f8f9fc;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #9b87f5;
+        }
+        
+        .example-box {
+            background: #f5f3ff;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            border-left: 4px solid #9b87f5;
+        }
+        
+        /* Rating scale */
+        .rating-scale {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .rating-btn {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #9b87f5;
+            border-radius: 6px;
+            background: white;
+            color: #9b87f5;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .rating-btn:hover {
+            background: #9b87f5;
+            color: white;
+        }
+        
+        .rating-btn.selected {
+            background: #9b87f5;
+            color: white;
+        }
+        
+        /* Timer display */
+        .timer-display {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #2c3e50;
+            text-align: center;
+            margin: 3rem 0;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        /* Results */
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .result-box {
+            background: #ecf0f1;
+            padding: 2rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .result-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .change-positive { 
+            color: #27ae60; 
+        }
+        
+        .change-negative { 
+            color: #e74c3c; 
+        }
+        
+        ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        li {
+            margin-bottom: 0.3rem;
+            color: #555;
+        }
+        
+        strong {
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <!-- SCREEN 1: GROUP SELECTION -->
+        <div id="group-selection-section" class="section active">
+            <h1>Group Assignment</h1>
+            <p class="text-center" style="font-size: 1.2rem; margin: 2rem 0; color: #333;">Please select your assigned group:</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem;">
+                <button class="group-btn glucose-btn" onclick="this.disabled=true; selectGroup('glucose')">
+                    Glucose Group
+                </button>
+                <button class="group-btn control-btn" onclick="this.disabled=true; selectGroup('control')">
+                    Control Group
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: DEMOGRAPHICS (BOTH GROUPS) -->
+        <div id="demographics-section" class="section">
+            <h1>Participant Information</h1>
+            
+            <form id="demographics-form">
+                <div class="form-group">
+                    <label for="firstName">First Name *</label>
+                    <input type="text" id="firstName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="lastName">Last Name *</label>
+                    <input type="text" id="lastName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="age">Age *</label>
+                    <input type="number" id="age" min="10" max="20" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="grade">Grade *</label>
+                    <input type="number" id="grade" min="9" max="12" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="gender">Gender *</label>
+                    <select id="gender" required>
+                        <option value="">Select...</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="timeSinceEating">How long ago did you last eat? *</label>
+                    <select id="timeSinceEating" required>
+                        <option value="">Select...</option>
+                        <option value="0-1 hours">0-1 hours</option>
+                        <option value="1-2 hours">1-2 hours</option>
+                        <option value="2-3 hours">2-3 hours</option>
+                        <option value="3-4 hours">3-4 hours</option>
+                        <option value="4+ hours">4+ hours</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn">Continue</button>
+            </form>
+        </div>
+
+        <!-- SCREEN 3 GLUCOSE: BG #1 ENTRY -->
+        <div id="glucose-bg1-section" class="section">
+            <h1>Blood Glucose Reading</h1>
+            <p class="text-center" style="margin: 2rem 0;">Please enter your current blood glucose reading.</p>
+            
+            <div class="form-group">
+                <label for="bg1">Blood Glucose (mg/dL) *</label>
+                <input type="number" id="bg1" min="0" max="500" placeholder="Enter reading" required>
+            </div>
+            
+            <button class="btn" id="submit-bg1" onclick="submitBG1()" disabled>Next</button>
+        </div>
+
+        <!-- SHARED: PRE-TEST INSTRUCTIONS -->
+        <div id="pretest-instructions-section" class="section">
+            <h1>Test Instructions</h1>
+            
+            <div class="instructions">
+                <p><strong>Welcome to the Dual 2-Back Test</strong></p>
+                <p>This test measures your working memory by asking you to remember both positions and letters.</p>
+            </div>
+            
+            <h3>How it works:</h3>
+            <ul>
+                <li>You'll see letters appear in a 3x3 grid</li>
+                <li>Remember BOTH the <strong>position</strong> and the <strong>letter</strong> from 2 steps ago</li>
+                <li>Click the appropriate button when there's a match</li>
+            </ul>
+            
+            <h3>Buttons:</h3>
+            <ul>
+                <li><strong>Position:</strong> Current position matches position from 2 steps ago</li>
+                <li><strong>Both:</strong> BOTH position AND letter match from 2 steps ago</li>
+                <li><strong>Letter:</strong> Current letter matches letter from 2 steps ago</li>
+            </ul>
+            
+            <div class="example-box">
+                <strong>Example:</strong> If you see "C" in top-left, then "F" in center, then "C" in top-left again → click "Both" (same position AND same letter from 2 steps ago)
+            </div>
+            
+            <p style="margin-top: 2rem;"><strong>You'll complete 30 trials for this test.</strong></p>
+            
+            <button class="btn" onclick="this.disabled=true; this.textContent='Loading...'; showSection('tutorial-section')">Continue to Tutorial</button>
+        </div>
+
+        <!-- SHARED: TUTORIAL (8 TRIALS, SKIPPABLE) -->
+        <div id="tutorial-section" class="section">
+            <h1>Practice Tutorial</h1>
+            <p class="text-center">Practice with 8 trials to get familiar with the test.</p>
+            
+            <div class="grid-3x3" id="tutorial-grid">
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+            </div>
+            
+            <div class="button-row">
+                <button class="test-button" onclick="handleTutorialResponse('position')">Position</button>
+                <button class="test-button" onclick="handleTutorialResponse('both')">Both</button>
+                <button class="test-button" onclick="handleTutorialResponse('letter')">Letter</button>
+            </div>
+            
+            <p class="text-center" style="margin-top: 1rem;">Trial: <span id="tutorial-trial">0</span>/8</p>
+            
+            <button class="btn btn-secondary" onclick="this.disabled=true; showSection('ready-section')">Skip Tutorial</button>
+        </div>
+
+        <!-- SHARED: READY SCREEN -->
+        <div id="ready-section" class="section">
+            <h1>Ready for the Test</h1>
+            <p class="text-center" style="font-size: 1.2rem; margin: 2rem 0;">You're about to start the actual test.</p>
+            <p class="text-center">This test consists of 30 trials and will take approximately 2-3 minutes.</p>
+            <p class="text-center" style="margin-top: 2rem;"><strong>Click the button below when you're ready to begin.</strong></p>
+            
+            <button class="btn" onclick="this.disabled=true; this.textContent='Loading...'; showSection('pretest-section'); startPreTest()">Start Actual Test</button>
+        </div>
+
+        <!-- SHARED: PRE-TEST (30 TRIALS) -->
+        <div id="pretest-section" class="section">
+            <h1>Pre-Test</h1>
+            
+            <div class="grid-3x3" id="pretest-grid">
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+            </div>
+            
+            <div class="button-row">
+                <button class="test-button" id="pretest-pos" onclick="handlePreTestResponse('position')">Position</button>
+                <button class="test-button" id="pretest-both" onclick="handlePreTestResponse('both')">Both</button>
+                <button class="test-button" id="pretest-let" onclick="handlePreTestResponse('letter')">Letter</button>
+            </div>
+            
+            <p class="text-center" style="margin-top: 1rem;">Trial: <span id="pretest-trial">0</span>/30</p>
+        </div>
+
+        <!-- SHARED: PRE-TEST DIFFICULTY RATING -->
+        <div id="pretest-difficulty-section" class="section">
+            <h1>Difficulty Rating</h1>
+            <p class="text-center" style="margin: 2rem 0;">How difficult did you find that test?</p>
+            <p class="text-center" style="color: #666; margin-bottom: 2rem;">1 = Very Easy, 10 = Very Difficult</p>
+            
+            <div class="rating-scale">
+                <button class="rating-btn" onclick="selectPreDifficulty(1)">1</button>
+                <button class="rating-btn" onclick="selectPreDifficulty(2)">2</button>
+                <button class="rating-btn" onclick="selectPreDifficulty(3)">3</button>
+                <button class="rating-btn" onclick="selectPreDifficulty(4)">4</button>
+                <button class="rating-btn" onclick="selectPreDifficulty(5)">5</button>
+                <button class="rating-btn" onclick="selectPreDifficulty(6)">6</button>
+                <button class="rating-btn" onclick="selectPreDifficulty(7)">7</button>
+                <button class="rating-btn" onclick="selectPreDifficulty(8)">8</button>
+                <button class="rating-btn" onclick="selectPreDifficulty(9)">9</button>
+                <button class="rating-btn" onclick="selectPreDifficulty(10)">10</button>
+            </div>
+            
+            <button class="btn" id="submit-pre-rating" onclick="submitPreDifficulty()" disabled>Continue</button>
+        </div>
+
+        <!-- GLUCOSE ONLY: WAIT FOR TABLET + START TIMER SCREEN -->
+        <div id="glucose-wait-tablet-section" class="section">
+            <h1>Glucose Group</h1>
+            <p class="text-center" style="font-size: 1.2rem; margin: 2rem 0; color: #333;">
+                Congratulations! You've completed the pre-test.
+            </p>
+            <p class="text-center" style="color: #666; margin-bottom: 3rem;">
+                Please wait for the administrator to give you the glucose tablet.<br>
+                Once you have received the tablet, click the button below to start the 15-minute wait period.
+            </p>
+            
+            <button class="btn" onclick="this.disabled=true; this.textContent='Starting...'; startTimer()">Start 15-Minute Timer</button>
+        </div>
+
+        <!-- CONTROL ONLY: COMPLETED PRE-TEST + START TIMER SCREEN -->
+        <div id="control-completed-pretest-section" class="section">
+            <h1>Pre-Test Complete</h1>
+            <p class="text-center" style="font-size: 1.2rem; margin: 2rem 0; color: #333;">
+                Congratulations! You have completed the pre-test.
+            </p>
+            <p class="text-center" style="color: #666; margin-bottom: 3rem;">
+                Click the button below to start the 15-minute wait period.
+            </p>
+            
+            <button class="btn" onclick="this.disabled=true; this.textContent='Starting...'; startTimer()">Start 15-Minute Timer</button>
+        </div>
+
+        <!-- BOTH: 15-MINUTE TIMER -->
+        <div id="timer-section" class="section">
+            <h1>15-Minute Wait Period</h1>
+            <p class="text-center" style="color: #666; margin-bottom: 2rem;">Please wait for the timer to complete.</p>
+            
+            <div class="timer-display" id="timer-display">15:00</div>
+            
+            <p class="text-center" style="color: #999;">You'll automatically proceed to the next section when the timer completes.</p>
+        </div>
+
+        <!-- GLUCOSE ONLY: BG #2 ENTRY -->
+        <div id="glucose-bg2-section" class="section">
+            <h1>Second Blood Glucose Reading</h1>
+            <p class="text-center" style="margin: 2rem 0;">Please enter your blood glucose reading now.</p>
+            
+            <div class="form-group">
+                <label for="bg2">Blood Glucose (mg/dL) *</label>
+                <input type="number" id="bg2" min="0" max="500" placeholder="Enter reading" required>
+            </div>
+            
+            <button class="btn" id="submit-bg2" onclick="submitBG2()" disabled>Next</button>
+        </div>
+
+        <!-- BOTH: POST-TEST INSTRUCTIONS (NO PRACTICE) -->
+        <div id="posttest-instructions-section" class="section">
+            <h1>Post-Test Instructions</h1>
+            
+            <div class="instructions">
+                <p><strong>Time for the Post-Test</strong></p>
+                <p>You'll now take the same test again. Try your best!</p>
+            </div>
+            
+            <p><strong>This test consists of 30 trials.</strong></p>
+            <p style="margin-top: 1rem;">Click the button below when you're ready to begin.</p>
+            
+            <button class="btn" onclick="this.disabled=true; this.textContent='Loading...'; showSection('posttest-section'); startPostTest()">Start Post-Test</button>
+        </div>
+
+        <!-- BOTH: POST-TEST (30 TRIALS) -->
+        <div id="posttest-section" class="section">
+            <h1>Post-Test</h1>
+            
+            <div class="grid-3x3" id="posttest-grid">
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+            </div>
+            
+            <div class="button-row">
+                <button class="test-button" id="posttest-pos" onclick="handlePostTestResponse('position')">Position</button>
+                <button class="test-button" id="posttest-both" onclick="handlePostTestResponse('both')">Both</button>
+                <button class="test-button" id="posttest-let" onclick="handlePostTestResponse('letter')">Letter</button>
+            </div>
+            
+            <p class="text-center" style="margin-top: 1rem;">Trial: <span id="posttest-trial">0</span>/30</p>
+        </div>
+
+        <!-- BOTH: POST-TEST DIFFICULTY RATING -->
+        <div id="posttest-difficulty-section" class="section">
+            <h1>Difficulty Rating</h1>
+            <p class="text-center" style="margin: 2rem 0;">How difficult did you find that test?</p>
+            <p class="text-center" style="color: #666; margin-bottom: 2rem;">1 = Very Easy, 10 = Very Difficult</p>
+            
+            <div class="rating-scale">
+                <button class="rating-btn" onclick="selectPostDifficulty(1)">1</button>
+                <button class="rating-btn" onclick="selectPostDifficulty(2)">2</button>
+                <button class="rating-btn" onclick="selectPostDifficulty(3)">3</button>
+                <button class="rating-btn" onclick="selectPostDifficulty(4)">4</button>
+                <button class="rating-btn" onclick="selectPostDifficulty(5)">5</button>
+                <button class="rating-btn" onclick="selectPostDifficulty(6)">6</button>
+                <button class="rating-btn" onclick="selectPostDifficulty(7)">7</button>
+                <button class="rating-btn" onclick="selectPostDifficulty(8)">8</button>
+                <button class="rating-btn" onclick="selectPostDifficulty(9)">9</button>
+                <button class="rating-btn" onclick="selectPostDifficulty(10)">10</button>
+            </div>
+            
+            <button class="btn" id="submit-post-rating" onclick="submitPostDifficulty()" disabled>See Your Results</button>
+        </div>
+
+        <!-- BOTH: RESULTS -->
+        <div id="results-section" class="section">
+            <h1>Congratulations! You have completed the study</h1>
+            
+            <div class="results-grid">
+                <div class="result-box">
+                    <div class="result-label">Pre-Test Score</div>
+                    <div class="result-value" id="pre-score-display">-</div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">Post-Test Score</div>
+                    <div class="result-value" id="post-score-display">-</div>
+                </div>
+            </div>
+            
+            <div class="result-box" style="margin-top: 1rem;">
+                <div class="result-label">Score Change</div>
+                <div class="result-value" id="change-display">-</div>
+            </div>
+            
+            <p class="text-center" style="margin-top: 2rem; color: #666;">Thank you for participating in this study!</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Request notification permission when page loads
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+        
+        // Configuration
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBrM9JGR3r6sRPQCfYYvFnk-rY6vCffM3nx4O4MViPbIBK65cmu5vlvu-cbhDNO3X1/exec';
+        const TIMER_DURATION = 900; // 15 minutes in seconds
+        
+        // State variables
+        let groupAssignment = '';
+        let participantId = '';
+        let studyData = {
+            demographics: {},
+            bloodGlucose: {
+                before: null,
+                after: null
+            },
+            preTest: {},
+            postTest: {}
+        };
+        
+        // Test variables
+        const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+        let sequence = [];
+        let currentTrial = 0;
+        let correctCount = 0;
+        let reactionTimes = [];
+        let trialStartTime = 0;
+        
+        // Timer variables
+        let timeRemaining = TIMER_DURATION;
+        let timerInterval = null;
+        let timerStartTime = null;
+        let oneMinuteWarningShown = false;
+        let originalTitle = document.title;
+        
+        // Difficulty ratings
+        let preDifficultyRating = 0;
+        let postDifficultyRating = 0;
+        
+        // Helper functions
+        function showSection(sectionId) {
+            console.log('showSection called with:', sectionId);
+            
+            try {
+                const section = document.getElementById(sectionId);
+                if (!section) {
+                    console.error('Section not found:', sectionId);
+                    const allSections = document.querySelectorAll('.section');
+                    console.error('Available sections:', Array.from(allSections).map(s => s.id).filter(id => id));
+                    return;
+                }
+                
+                // Remove active from all sections
+                const allSections = document.querySelectorAll('.section');
+                allSections.forEach(s => {
+                    if (s && s.classList) {
+                        s.classList.remove('active');
+                    }
+                });
+                
+                // Add active to target section
+                section.classList.add('active');
+                console.log('Successfully showing section:', sectionId);
+                
+            } catch (error) {
+                console.error('Error in showSection:', error);
+                console.error('Section ID:', sectionId);
+            }
+        }
+        
+        function generateSequence(length) {
+            const sequence = [];
+            for (let i = 0; i < length; i++) {
+                sequence.push({
+                    position: Math.floor(Math.random() * 9),
+                    letter: LETTERS[Math.floor(Math.random() * LETTERS.length)]
+                });
+            }
+            return sequence;
+        }
+        
+        function displayStimulus(gridId, position, letter) {
+            const grid = document.getElementById(gridId);
+            const cells = grid.querySelectorAll('.grid-cell');
+            
+            // Clear all cells
+            cells.forEach(cell => {
+                cell.textContent = '';
+                cell.classList.remove('active');
+            });
+            
+            // Show stimulus
+            if (position !== null && letter !== null) {
+                cells[position].textContent = letter;
+                cells[position].classList.add('active');
+            }
+        }
+        
+        // GROUP SELECTION
+        function selectGroup(group) {
+            groupAssignment = group;
+            localStorage.setItem('groupAssignment', group);
+            console.log('Group selected:', group);
+            
+            // Create participant ID immediately
+            participantId = 'P' + Date.now();
+            localStorage.setItem('participantId', participantId);
+            
+            // POST to Google Sheets in background (don't wait)
+            fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    participantId: participantId,
+                    groupAssignment: group,
+                    timestamp: new Date().toISOString()
+                })
+            }).then(() => {
+                console.log('Initial entry created');
+            }).catch(error => {
+                console.error('Error creating entry:', error);
+            });
+            
+            // Go to demographics immediately (don't wait for POST)
+            showSection('demographics-section');
+        }
+        
+        // DEMOGRAPHICS
+        let isSubmittingDemo = false;
+        
+        document.getElementById('demographics-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (isSubmittingDemo) {
+                console.log('Already submitting demographics...');
+                return;
+            }
+            isSubmittingDemo = true;
+            
+            // Disable submit button
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Loading...';
+            }
+            
+            const demographics = {
+                firstName: document.getElementById('firstName').value.trim(),
+                lastName: document.getElementById('lastName').value.trim(),
+                age: document.getElementById('age').value,
+                grade: document.getElementById('grade').value,
+                gender: document.getElementById('gender').value,
+                timeSinceEating: document.getElementById('timeSinceEating').value
+            };
+            
+            studyData.demographics = demographics;
+            
+            // Update the existing row with demographics
+            try {
+                console.log('Updating row with demographics...');
+                await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        participantId: participantId,
+                        groupAssignment: groupAssignment,
+                        demographics: demographics,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+                console.log('Demographics updated');
+            } catch (error) {
+                console.error('Error updating demographics:', error);
+            }
+            
+            localStorage.setItem('demographics', JSON.stringify(demographics));
+            
+            // Route based on group
+            if (groupAssignment === 'glucose' || groupAssignment.includes('glucose')) {
+                console.log('Glucose group: going to BG #1 entry');
+                showSection('glucose-bg1-section');
+            } else {
+                console.log('Control group: going to pre-test instructions');
+                showSection('pretest-instructions-section');
+            }
+            
+            isSubmittingDemo = false;
+        });
+        
+        // BG #1 ENTRY (Glucose only)
+        document.getElementById('bg1').addEventListener('input', function() {
+            const value = this.value;
+            document.getElementById('submit-bg1').disabled = !value || value < 0 || value > 500;
+        });
+        
+        function submitBG1() {
+            const bg1 = document.getElementById('bg1').value;
+            if (!bg1 || bg1 < 0 || bg1 > 500) {
+                alert('Please enter a valid blood glucose reading');
+                return;
+            }
+            studyData.bloodGlucose.before = parseInt(bg1);
+            console.log('BG #1 recorded:', bg1);
+            showSection('pretest-instructions-section');
+        }
+        
+        // TUTORIAL
+        let tutorialSequence = [];
+        let tutorialTrial = 0;
+        let tutorialTimeout = null;
+        
+        function startTutorial() {
+            tutorialSequence = generateSequence(8);
+            tutorialTrial = 0;
+            showTutorialTrial();
+        }
+        
+        function showTutorialTrial() {
+            if (tutorialTrial >= 8) {
+                showSection('ready-section');
+                return;
+            }
+            
+            document.getElementById('tutorial-trial').textContent = tutorialTrial + 1;
+            const current = tutorialSequence[tutorialTrial];
+            displayStimulus('tutorial-grid', current.position, current.letter);
+            
+            // Use fixed timing intervals
+            tutorialTimeout = setTimeout(() => {
+                displayStimulus('tutorial-grid', null, null);
+            }, 500);
+            
+            // Schedule next trial at exact 3000ms
+            setTimeout(() => {
+                tutorialTrial++;
+                showTutorialTrial();
+            }, 3000);
+        }
+        
+        function handleTutorialResponse(type) {
+            clearTimeout(tutorialTimeout);
+            displayStimulus('tutorial-grid', null, null);
+            // The 3000ms timer will advance to next trial
+        }
+        
+        // Listen for tutorial section activation
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.target.id === 'tutorial-section' && mutation.target.classList.contains('active')) {
+                    setTimeout(startTutorial, 500);
+                }
+            });
+        });
+        
+        const tutorialSection = document.getElementById('tutorial-section');
+        if (tutorialSection) {
+            observer.observe(tutorialSection, { attributes: true, attributeFilter: ['class'] });
+        }
+        
+        // PRE-TEST
+        let preTestSequence = [];
+        let preTestTrial = 0;
+        let preTestCorrectCount = 0;
+        let preTestReactionTimes = [];
+        let preTestStartTime = 0;
+        let preTestTimeout = null;
+        
+        function startPreTest() {
+            preTestSequence = generateSequence(30);
+            preTestTrial = 0;
+            preTestCorrectCount = 0;
+            preTestReactionTimes = [];
+            showPreTestTrial();
+        }
+        
+        function showPreTestTrial() {
+            if (preTestTrial >= 30) {
+                finishPreTest();
+                return;
+            }
+            
+            document.getElementById('pretest-trial').textContent = preTestTrial + 1;
+            const current = preTestSequence[preTestTrial];
+            preTestStartTime = Date.now();
+            displayStimulus('pretest-grid', current.position, current.letter);
+            
+            // Use fixed timing intervals
+            preTestTimeout = setTimeout(() => {
+                // No response - record 0ms
+                preTestReactionTimes.push(0);
+                displayStimulus('pretest-grid', null, null);
+            }, 500);
+            
+            // Schedule next trial at exact 3000ms from start
+            setTimeout(() => {
+                preTestTrial++;
+                showPreTestTrial();
+            }, 3000);
+        }
+        
+        function handlePreTestResponse(type) {
+            const rt = Date.now() - preTestStartTime;
+            preTestReactionTimes.push(rt);
+            
+            clearTimeout(preTestTimeout);
+            
+            // Check if correct
+            if (preTestTrial >= 2) {
+                const current = preTestSequence[preTestTrial];
+                const twoBack = preTestSequence[preTestTrial - 2];
+                
+                const posMatch = current.position === twoBack.position;
+                const letMatch = current.letter === twoBack.letter;
+                
+                let correct = false;
+                if (type === 'position' && posMatch && !letMatch) correct = true;
+                if (type === 'letter' && letMatch && !posMatch) correct = true;
+                if (type === 'both' && posMatch && letMatch) correct = true;
+                
+                if (correct) preTestCorrectCount++;
+            }
+            
+            // Visual feedback - clear immediately
+            displayStimulus('pretest-grid', null, null);
+            
+            // Don't advance yet - the 3000ms timer will handle it
+            // This ensures consistent 3-second intervals
+        }
+        
+        function finishPreTest() {
+            const totalTrials = 30;
+            const avgRT = preTestReactionTimes.filter(rt => rt > 0).reduce((a, b) => a + b, 0) / 
+                          preTestReactionTimes.filter(rt => rt > 0).length;
+            
+            studyData.preTest = {
+                score: Math.round((preTestCorrectCount / totalTrials) * 100),
+                correctCount: preTestCorrectCount,
+                avgReactionTime: Math.round(avgRT),
+                reactionTimes: preTestReactionTimes,
+                difficultyRating: null
+            };
+            
+            console.log('Pre-test complete:', studyData.preTest);
+            showSection('pretest-difficulty-section');
+        }
+        
+        // PRE-TEST DIFFICULTY
+        function selectPreDifficulty(rating) {
+            preDifficultyRating = rating;
+            
+            // Visual feedback
+            document.querySelectorAll('#pretest-difficulty-section .rating-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            document.getElementById('submit-pre-rating').disabled = false;
+        }
+        
+        async function submitPreDifficulty() {
+            studyData.preTest.difficultyRating = preDifficultyRating;
+            
+            // Route based on group
+            if (groupAssignment === 'glucose' || groupAssignment.includes('glucose')) {
+                console.log('Glucose group: going to wait for tablet screen');
+                showSection('glucose-wait-tablet-section');
+            } else {
+                console.log('Control group: going to completed pre-test screen');
+                showSection('control-completed-pretest-section');
+            }
+        }
+        
+        // TIMER (uses timestamps for accuracy)
+        // Duplicate removed: oneMinuteWarningShown
+        
+        function startTimer() {
+            timerStartTime = Date.now();
+            timeRemaining = TIMER_DURATION;
+            oneMinuteWarningShown = false;
+            showSection('timer-section');
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                // Calculate time remaining based on actual elapsed time
+                const elapsed = Math.floor((Date.now() - timerStartTime) / 1000);
+                timeRemaining = TIMER_DURATION - elapsed;
+                
+                // Show warning at 1 minute
+                if (timeRemaining <= 60 && timeRemaining > 59 && !oneMinuteWarningShown) {
+                    oneMinuteWarningShown = true;
+                    showTimerWarning();
+                }
+                
+                updateTimerDisplay();
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    
+                    // Route based on group after timer
+                    if (groupAssignment === 'glucose' || groupAssignment.includes('glucose')) {
+                        console.log('Glucose group: timer done, going to BG #2');
+                        showSection('glucose-bg2-section');
+                    } else {
+                        console.log('Control group: timer done, going to post-test instructions');
+                        showSection('posttest-instructions-section');
+                    }
+                }
+            }, 1000);
+        }
+        
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            document.getElementById('timer-display').textContent = 
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        function showTimerWarning() {
+            const timerDisplay = document.getElementById('timer-display');
+            const originalColor = timerDisplay.style.color;
+            
+            // Flash the timer and show message
+            timerDisplay.style.color = '#e74c3c';
+            
+            // Create warning message
+            const warning = document.createElement('p');
+            warning.textContent = 'One minute remaining';
+            warning.style.cssText = 'text-align: center; color: #e74c3c; font-size: 1.5rem; font-weight: 600; margin-top: 2rem; animation: fadeIn 0.5s;';
+            warning.id = 'timer-warning';
+            
+            const timerSection = document.getElementById('timer-section');
+            const existingWarning = document.getElementById('timer-warning');
+            if (existingWarning) {
+                existingWarning.remove();
+            }
+            timerSection.appendChild(warning);
+            
+            // Flash effect
+            setTimeout(() => {
+                timerDisplay.style.color = originalColor;
+            }, 500);
+            setTimeout(() => {
+                timerDisplay.style.color = '#e74c3c';
+            }, 1000);
+            setTimeout(() => {
+                timerDisplay.style.color = originalColor;
+            }, 1500);
+        }
+        
+        // BG #2 ENTRY (Glucose only)
+        document.getElementById('bg2').addEventListener('input', function() {
+            const value = this.value;
+            document.getElementById('submit-bg2').disabled = !value || value < 0 || value > 500;
+        });
+        
+        function submitBG2() {
+            const bg2 = document.getElementById('bg2').value;
+            if (!bg2 || bg2 < 0 || bg2 > 500) {
+                alert('Please enter a valid blood glucose reading');
+                return;
+            }
+            studyData.bloodGlucose.after = parseInt(bg2);
+            console.log('BG #2 recorded:', bg2);
+            showSection('posttest-instructions-section');
+        }
+        
+        // POST-TEST
+        let postTestSequence = [];
+        let postTestTrial = 0;
+        let postTestCorrectCount = 0;
+        let postTestReactionTimes = [];
+        let postTestStartTime = 0;
+        let postTestTimeout = null;
+        
+        function startPostTest() {
+            postTestSequence = generateSequence(30);
+            postTestTrial = 0;
+            postTestCorrectCount = 0;
+            postTestReactionTimes = [];
+            showPostTestTrial();
+        }
+        
+        function showPostTestTrial() {
+            if (postTestTrial >= 30) {
+                finishPostTest();
+                return;
+            }
+            
+            document.getElementById('posttest-trial').textContent = postTestTrial + 1;
+            const current = postTestSequence[postTestTrial];
+            postTestStartTime = Date.now();
+            displayStimulus('posttest-grid', current.position, current.letter);
+            
+            // Use fixed timing intervals
+            postTestTimeout = setTimeout(() => {
+                // No response - record 0ms
+                postTestReactionTimes.push(0);
+                displayStimulus('posttest-grid', null, null);
+            }, 500);
+            
+            // Schedule next trial at exact 3000ms from start
+            setTimeout(() => {
+                postTestTrial++;
+                showPostTestTrial();
+            }, 3000);
+        }
+        
+        function handlePostTestResponse(type) {
+            const rt = Date.now() - postTestStartTime;
+            postTestReactionTimes.push(rt);
+            
+            clearTimeout(postTestTimeout);
+            
+            // Check if correct
+            if (postTestTrial >= 2) {
+                const current = postTestSequence[postTestTrial];
+                const twoBack = postTestSequence[postTestTrial - 2];
+                
+                const posMatch = current.position === twoBack.position;
+                const letMatch = current.letter === twoBack.letter;
+                
+                let correct = false;
+                if (type === 'position' && posMatch && !letMatch) correct = true;
+                if (type === 'letter' && letMatch && !posMatch) correct = true;
+                if (type === 'both' && posMatch && letMatch) correct = true;
+                
+                if (correct) postTestCorrectCount++;
+            }
+            
+            // Visual feedback - clear immediately
+            displayStimulus('posttest-grid', null, null);
+            
+            // Don't advance yet - the 3000ms timer will handle it
+        }
+        
+        function finishPostTest() {
+            const totalTrials = 30;
+            const avgRT = postTestReactionTimes.filter(rt => rt > 0).reduce((a, b) => a + b, 0) / 
+                          postTestReactionTimes.filter(rt => rt > 0).length;
+            
+            studyData.postTest = {
+                score: Math.round((postTestCorrectCount / totalTrials) * 100),
+                correctCount: postTestCorrectCount,
+                avgReactionTime: Math.round(avgRT),
+                reactionTimes: postTestReactionTimes,
+                difficultyRating: null
+            };
+            
+            console.log('Post-test complete:', studyData.postTest);
+            showSection('posttest-difficulty-section');
+        }
+        
+        // POST-TEST DIFFICULTY
+        function selectPostDifficulty(rating) {
+            postDifficultyRating = rating;
+            
+            // Visual feedback
+            document.querySelectorAll('#posttest-difficulty-section .rating-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            document.getElementById('submit-post-rating').disabled = false;
+        }
+        
+        let isFinalSubmitting = false;
+        
+        async function submitPostDifficulty() {
+            if (isFinalSubmitting) {
+                console.log('Already submitting final data...');
+                return;
+            }
+            isFinalSubmitting = true;
+            
+            studyData.postTest.difficultyRating = postDifficultyRating;
+            
+            // Calculate changes
+            const scoreChange = studyData.postTest.score - studyData.preTest.score;
+            const rtChange = studyData.postTest.avgReactionTime - studyData.preTest.avgReactionTime;
+            
+            // Format RT data nicely
+            const formatRTData = (rts) => {
+                let formatted = '';
+                rts.forEach((rt, i) => {
+                    formatted += `Trial ${i + 1}: ${rt}ms\n`;
+                });
+                
+                const validRTs = rts.filter(rt => rt > 0);
+                if (validRTs.length > 0) {
+                    formatted += `\nHighest RT: ${Math.max(...validRTs)}ms\n`;
+                    formatted += `Lowest RT: ${Math.min(...validRTs)}ms\n`;
+                    const avg = validRTs.reduce((a, b) => a + b, 0) / validRTs.length;
+                    formatted += `Average RT: ${Math.round(avg)}ms`;
+                }
+                
+                return formatted;
+            };
+            
+            // POST final data to Google Sheets
+            console.log('========================');
+            console.log('POSTING TO GOOGLE SHEETS');
+            console.log('========================');
+            console.log('Participant ID:', participantId);
+            console.log('Group:', groupAssignment);
+            
+            try {
+                const postData = {
+                    participantId: participantId,
+                    groupAssignment: groupAssignment,
+                    demographics: studyData.demographics,
+                    bloodGlucoseBefore: studyData.bloodGlucose.before,
+                    bloodGlucoseAfter: studyData.bloodGlucose.after,
+                    preTestScore: studyData.preTest.score,
+                    preTestCorrect: studyData.preTest.correctCount,
+                    preTestAvgRT: studyData.preTest.avgReactionTime,
+                    preTestAllRTs: formatRTData(studyData.preTest.reactionTimes),
+                    preTestDifficulty: studyData.preTest.difficultyRating,
+                    postTestScore: studyData.postTest.score,
+                    postTestCorrect: studyData.postTest.correctCount,
+                    postTestAvgRT: studyData.postTest.avgReactionTime,
+                    postTestAllRTs: formatRTData(studyData.postTest.reactionTimes),
+                    postTestDifficulty: studyData.postTest.difficultyRating,
+                    scoreChange: scoreChange,
+                    rtChange: rtChange,
+                    timestamp: new Date().toISOString()
+                };
+                
+                console.log('Data being sent:', postData);
+                
+                await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(postData)
+                });
+                
+                console.log('POST complete!');
+            } catch (error) {
+                console.error('Error posting final data:', error);
+            }
+            
+            // Show results
+            document.getElementById('pre-score-display').textContent = studyData.preTest.score + '%';
+            document.getElementById('post-score-display').textContent = studyData.postTest.score + '%';
+            
+            const changeDisplay = document.getElementById('change-display');
+            if (scoreChange > 0) {
+                changeDisplay.textContent = '+' + scoreChange + '%';
+                changeDisplay.className = 'result-value change-positive';
+            } else if (scoreChange < 0) {
+                changeDisplay.textContent = scoreChange + '%';
+                changeDisplay.className = 'result-value change-negative';
+            } else {
+                changeDisplay.textContent = scoreChange + '%';
+                changeDisplay.className = 'result-value';
+            }
+            
+            showSection('results-section');
+        }
+        
+        // Page load
+        window.addEventListener('load', () => {
+            const savedParticipantId = localStorage.getItem('participantId');
+            const savedAssignment = localStorage.getItem('groupAssignment');
+            
+            if (savedParticipantId) {
+                participantId = savedParticipantId;
+            }
+            if (savedAssignment) {
+                groupAssignment = savedAssignment;
+            }
+        });
+        
+        // Handle tab visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && timeRemaining <= 0 && timerStartTime !== null) {
+                // They returned after timer finished
+                if (!document.getElementById('timer-complete-modal')) {
+                    showTimerCompleteModal();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
