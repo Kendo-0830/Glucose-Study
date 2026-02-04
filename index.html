@@ -772,7 +772,7 @@
         }
         
         // GROUP SELECTION
-        async function selectGroup(group) {
+        function selectGroup(group) {
             groupAssignment = group;
             localStorage.setItem('groupAssignment', group);
             console.log('Group selected:', group);
@@ -781,24 +781,23 @@
             participantId = 'P' + Date.now();
             localStorage.setItem('participantId', participantId);
             
-            // POST to Google Sheets immediately with just group assignment
-            try {
-                console.log('Creating initial entry with group:', group);
-                await fetch(APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        participantId: participantId,
-                        groupAssignment: group,
-                        timestamp: new Date().toISOString()
-                    })
-                });
+            // POST to Google Sheets in background (don't wait)
+            fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    participantId: participantId,
+                    groupAssignment: group,
+                    timestamp: new Date().toISOString()
+                })
+            }).then(() => {
                 console.log('Initial entry created');
-            } catch (error) {
+            }).catch(error => {
                 console.error('Error creating entry:', error);
-            }
+            });
             
+            // Go to demographics immediately (don't wait for POST)
             showSection('demographics-section');
         }
         
