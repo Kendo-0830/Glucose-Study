@@ -1467,8 +1467,22 @@
         
         // Page load
         window.addEventListener('load', () => {
+            console.log('=== PAGE LOAD STARTED ===');
+            console.log('Current URL:', window.location.href);
+            console.log('All localStorage keys:', Object.keys(localStorage));
+            
+            // Check if reset parameter in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('reset') === 'true') {
+                console.log('Reset parameter detected - clearing all data');
+                localStorage.clear();
+                window.location.href = window.location.pathname; // Remove parameter and reload
+                return;
+            }
+            
             // Restore persistent data
             const savedParticipantId = localStorage.getItem('participantId');
+            console.log('savedParticipantId:', savedParticipantId);
             const savedAssignment = localStorage.getItem('groupAssignment');
             const savedDemographics = localStorage.getItem('demographics');
             const savedScreen = localStorage.getItem('currentScreen');
@@ -1501,10 +1515,17 @@
             }
             
             // Resume to saved screen if exists and not mid-test
+            console.log('savedScreen value:', savedScreen);
+            console.log('Should resume?', savedScreen && savedScreen !== 'pretest-section' && savedScreen !== 'posttest-section');
+            
             if (savedScreen && savedScreen !== 'pretest-section' && savedScreen !== 'posttest-section') {
-                console.log('Resuming to screen:', savedScreen);
+                console.log('RESUMING to screen:', savedScreen);
                 showSection(savedScreen);
+            } else {
+                console.log('NOT resuming - starting fresh on group-selection-section');
             }
+            
+            console.log('=== PAGE LOAD COMPLETE ===');
         });
         
         // Handle tab visibility changes
