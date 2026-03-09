@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dual 2-Back Concentration Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #e6f2ff 0%, #f0e6ff 100%);
+            padding: 1rem;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #5a9fd4;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .instructions {
+            background: #f8f9fc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .instructions h2 {
+            color: #5a9fd4;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .instructions p {
+            color: #555;
+            margin-bottom: 0.8rem;
+        }
+        
+        .instructions ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .instructions li {
+            margin-bottom: 0.5rem;
+            color: #555;
+        }
+        
+        .grid-3x3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            max-width: 350px;
+            margin: 2rem auto;
+        }
+        
+        .grid-cell {
+            aspect-ratio: 1;
+            border: 3px solid #9b87f5;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
+            color: #9b87f5;
+            background: white;
+        }
+        
+        .grid-cell.active {
+            background: #9b87f5;
+            color: white;
+        }
+        
+        .trial-counter {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #5a9fd4;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .button-row {
+            display: flex;
+            gap: 0.8rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .test-button {
+            flex: 1;
+            min-width: 150px;
+            padding: 1.2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: 3px solid #9b87f5;
+            background: white;
+            color: #9b87f5;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .test-button:active {
+            transform: scale(0.95);
+            background: #f5f3ff;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            background: #9b87f5;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 1rem;
+        }
+        
+        .btn:hover {
+            background: #8b77e5;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .results-box {
+            background: #f8f9fc;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .score {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #5a9fd4;
+            margin: 1rem 0;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-label {
+            color: #777;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .stat-value {
+            color: #2c3e50;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .grid-3x3 {
+                max-width: 280px;
+            }
+            
+            .grid-cell {
+                font-size: 2.5rem;
+            }
+            
+            .test-button {
+                min-width: 100%;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Instructions Section -->
+        <div id="instructions-section" class="section active">
+            <h1>Dual 2-Back Test</h1>
+            <div class="instructions">
+                <h2>How It Works:</h2>
+                <p>You'll see letters appear in different positions on a 3×3 grid. Your job is to remember both the <strong>position</strong> and <strong>letter</strong> from <strong>2 steps ago</strong>.</p>
+                
+                <h2>When to Click:</h2>
+                <ul>
+                    <li><strong>Position:</strong> Current position matches 2 steps ago, but letter is different</li>
+                    <li><strong>Letter:</strong> Current letter matches 2 steps ago, but position is different</li>
+                    <li><strong>Both:</strong> Both position AND letter match 2 steps ago</li>
+                    <li><strong>Nothing:</strong> If neither matches, don't click</li>
+                </ul>
+                
+                <p><strong>You have 30 trials.</strong> Each letter appears for 0.5 seconds, then disappears. You can click anytime during the 3-second trial window.</p>
+            </div>
+            <button class="btn" onclick="startTest()">Start Test</button>
+        </div>
+        
+        <!-- Test Section -->
+        <div id="test-section" class="section">
+            <h1>Dual 2-Back Test</h1>
+            <div class="trial-counter">Trial <span id="trial-number">1</span> of 30</div>
+            
+            <div class="grid-3x3" id="test-grid">
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+            </div>
+            
+            <div class="button-row">
+                <button class="test-button" id="test-pos" onclick="handleResponse('position')">Position</button>
+                <button class="test-button" id="test-both" onclick="handleResponse('both')">Both</button>
+                <button class="test-button" id="test-let" onclick="handleResponse('letter')">Letter</button>
+            </div>
+        </div>
+        
+        <!-- Results Section -->
+        <div id="results-section" class="section">
+            <h1>Test Complete!</h1>
+            <div class="results-box">
+                <div class="score" id="score-display">--</div>
+                <div class="stat-row">
+                    <div class="stat">
+                        <div class="stat-label">Correct</div>
+                        <div class="stat-value"><span id="correct-count">--</span>/30</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Average RT</div>
+                        <div class="stat-value"><span id="avg-rt">--</span>ms</div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn" onclick="location.reload()">Take Test Again</button>
+        </div>
+    </div>
+
+    <script>
+        const LETTERS = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+        let sequence = [];
+        let currentTrial = 0;
+        let correctCount = 0;
+        let reactionTimes = [];
+        let trialStartTime = 0;
+        let responseRecorded = false;
+        let trialTimeout = null;
+        
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+        }
+        
+        function generateSequence(count) {
+            const seq = [];
+            for (let i = 0; i < count; i++) {
+                seq.push({
+                    position: Math.floor(Math.random() * 9),
+                    letter: LETTERS[Math.floor(Math.random() * LETTERS.length)]
+                });
+            }
+            return seq;
+        }
+        
+        function displayStimulus(gridId, position, letter) {
+            const grid = document.getElementById(gridId);
+            const cells = grid.querySelectorAll('.grid-cell');
+            
+            cells.forEach((cell, index) => {
+                cell.classList.remove('active');
+                cell.textContent = '';
+                if (index === position && letter) {
+                    cell.classList.add('active');
+                    cell.textContent = letter;
+                }
+            });
+        }
+        
+        function startTest() {
+            sequence = generateSequence(30);
+            currentTrial = 0;
+            correctCount = 0;
+            reactionTimes = [];
+            showSection('test-section');
+            showTrial();
+        }
+        
+        function showTrial() {
+            if (currentTrial >= 30) {
+                finishTest();
+                return;
+            }
+            
+            responseRecorded = false;
+            document.getElementById('trial-number').textContent = currentTrial + 1;
+            
+            const current = sequence[currentTrial];
+            trialStartTime = Date.now();
+            displayStimulus('test-grid', current.position, current.letter);
+            
+            // Hide stimulus after 500ms
+            trialTimeout = setTimeout(() => {
+                if (responseRecorded) return;
+                
+                reactionTimes.push(0);
+                
+                // Check if not responding was correct
+                if (currentTrial >= 2) {
+                    const twoBack = sequence[currentTrial - 2];
+                    const posMatch = current.position === twoBack.position;
+                    const letMatch = current.letter === twoBack.letter;
+                    
+                    if (!posMatch && !letMatch) {
+                        correctCount++;
+                    }
+                }
+                
+                displayStimulus('test-grid', null, null);
+            }, 500);
+            
+            // Advance to next trial at 3000ms
+            setTimeout(() => {
+                currentTrial++;
+                showTrial();
+            }, 3000);
+        }
+        
+        function handleResponse(type) {
+            if (responseRecorded) return;
+            responseRecorded = true;
+            
+            const rt = Date.now() - trialStartTime;
+            reactionTimes.push(rt);
+            
+            clearTimeout(trialTimeout);
+            
+            // Check if correct
+            if (currentTrial >= 2) {
+                const current = sequence[currentTrial];
+                const twoBack = sequence[currentTrial - 2];
+                
+                const posMatch = current.position === twoBack.position;
+                const letMatch = current.letter === twoBack.letter;
+                
+                let correct = false;
+                if (type === 'position' && posMatch && !letMatch) correct = true;
+                if (type === 'letter' && letMatch && !posMatch) correct = true;
+                if (type === 'both' && posMatch && letMatch) correct = true;
+                
+                if (correct) correctCount++;
+            }
+            
+            displayStimulus('test-grid', null, null);
+        }
+        
+        function finishTest() {
+            const score = Math.round((correctCount / 30) * 100);
+            const validRTs = reactionTimes.filter(rt => rt > 0);
+            const avgRT = validRTs.length > 0 
+                ? Math.round(validRTs.reduce((a, b) => a + b, 0) / validRTs.length)
+                : 0;
+            
+            document.getElementById('score-display').textContent = score + '%';
+            document.getElementById('correct-count').textContent = correctCount;
+            document.getElementById('avg-rt').textContent = avgRT;
+            
+            showSection('results-section');
+        }
+    </script>
+</body>
+</html>
